@@ -8,7 +8,7 @@ const roboto = Roboto({
 });
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://friendle.vercel.app';
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://friendle-three.vercel.app';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

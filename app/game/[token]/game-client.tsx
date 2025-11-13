@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { MAX_GUESSES, WORD_LENGTH } from '@/lib/game';
 import type {
   ApiErrorResponse,
@@ -10,12 +11,17 @@ import type {
 } from '@/types';
 import Board from '@/components/game/board';
 import Keyboard from '@/components/game/keyboard';
+import { cn } from '@/lib/utils';
 
 interface GameClientProps {
   token: string;
 }
 
+type GameResult = 'playing' | 'win' | 'loss';
+
 export default function GameClient({ token }: GameClientProps) {
+  const router = useRouter();
+
   const [board, setBoard] = useState<BoardRow[]>(
     Array.from({ length: MAX_GUESSES }, () => ({ letters: '', pattern: null }))
   );
@@ -27,6 +33,7 @@ export default function GameClient({ token }: GameClientProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [gameError, setGameError] = useState<string | null>(null);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [gameResult, setGameResult] = useState<GameResult>('playing');
   const [toast, setToast] = useState<string | null>(null);
   const [revealingRowIndex, setRevealingRowIndex] = useState<number | null>(
     null
@@ -55,7 +62,9 @@ export default function GameClient({ token }: GameClientProps) {
 
   const showToast = useCallback((message: string) => {
     setToast(message);
-    setTimeout(() => setToast(null), 1400);
+    setTimeout(() => {
+      setToast((current) => (current === message ? null : current));
+    }, 1400);
   }, []);
 
   const triggerShake = useCallback((rowIndex: number) => {
@@ -152,12 +161,13 @@ export default function GameClient({ token }: GameClientProps) {
 
       if (data.isWin) {
         setIsGameOver(true);
-        showToast('You won!');
+        setGameResult('win');
         return;
       }
 
       if (currentRow + 1 >= MAX_GUESSES) {
         setIsGameOver(true);
+        setGameResult('loss');
         showToast('Out of guesses!');
         return;
       }
@@ -248,6 +258,8 @@ export default function GameClient({ token }: GameClientProps) {
     );
   }
 
+  const showWinPanel = gameResult === 'win';
+
   return (
     <div className="flex h-full w-full max-w-md flex-col items-center justify-between gap-6">
       <div className="mt-4 flex flex-col items-center gap-2">
@@ -261,7 +273,40 @@ export default function GameClient({ token }: GameClientProps) {
         />
       </div>
 
-      <Keyboard keyboardMap={keyboardMap} onKey={handleKey} />
+      <div className="relative w-full min-h-24 flex items-center justify-center mb-2">
+        {/* Keyboard container */}
+        <div
+          className={cn(
+            'w-full transition-all duration-300 ease-out',
+            showWinPanel
+              ? 'translate-y-4 opacity-0 pointer-events-none'
+              : 'translate-y-0 opacity-100'
+          )}
+        >
+          <Keyboard keyboardMap={keyboardMap} onKey={handleKey} />
+        </div>
+
+        {/* Win panel */}
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-x-0 top-0 flex flex-col items-center justify-center gap-3 transition-all duration-300 ease-out',
+            showWinPanel
+              ? 'translate-y-0 opacity-100 pointer-events-auto'
+              : 'translate-y-4 opacity-0'
+          )}
+        >
+          <p className="text-lg font-semibold text-foreground">
+            You did it! 🎉
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push('/create')}
+            className="rounded-full min-w-40 bg-success px-5 py-2.5 text-sm font-semibold text-foreground hover:brightness-110"
+          >
+            Create word
+          </button>
+        </div>
+      </div>
 
       {toast && (
         <div className="pointer-events-none fixed top-20 flex w-full justify-center">
