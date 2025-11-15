@@ -16,11 +16,55 @@ export const metadata: Metadata = {
   description: 'Very original word guessing game',
   openGraph: {
     title: 'Friendle',
-    description: 'Very original word guessing game',
+    description: 'A very original word guessing game',
     url: '/',
     siteName: 'Friendle',
     locale: 'en_US',
     type: 'website',
+
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 628,
+        alt: 'Friendle',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Friendle',
+    description: 'A very original word guessing game',
+    images: ['/og.png'],
+  },
+
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
+      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+    ],
+    apple: [
+      {
+        url: '/apple-touch-icon.png',
+        type: 'image/png',
+        sizes: '180x180',
+      },
+    ],
+    other: [
+      {
+        rel: 'android-chrome',
+        url: '/android-chrome-192x192.png',
+        type: 'image/png',
+        sizes: '192x192',
+      },
+      {
+        rel: 'android-chrome',
+        url: '/android-chrome-512x512.png',
+        type: 'image/png',
+        sizes: '512x512',
+      },
+    ],
   },
 };
 
